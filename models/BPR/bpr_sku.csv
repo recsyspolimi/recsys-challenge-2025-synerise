@@ -1,0 +1,2 @@
+number,value,datetime_start,datetime_complete,duration,params_add_weight,params_buy_weight,params_factors,params_iterations,params_learning_rate,params_regularization,params_remove_weight,state
+1453,0.623315824405605,2025-06-30 13:24:49.890097,2025-06-30 13:25:18.149533,0 days 00:00:28.259436,1.1508948677473025,1.2900018772221913,232,427,0.03737387161230796,0.04421948803102201,-0.17875830022431233,COMPLETE
