@@ -21,12 +21,12 @@ def regularize_embeddings(embeddings, old_embeddings, alpha_old=0.3):
 def main():
     parser = ArgumentParser()
     parser.add_argument('--sra_dir', type=str, required=True, help="Folder where SRA embeddings are saved")
-    parser.add_argument("--sra_old2new_dir", type=str, required=True, help="Folder where SRA Old2New embeddings are saved")
+    parser.add_argument("--sra_first_phase_dir", type=str, required=True, help="Folder where SRA First Phase embeddings are saved")
     parser.add_argument("--mtl_dir", type=str, required=True, help="Folder where MTL embeddings are saved")
-    parser.add_argument("--mtl_old2new_dir", type=str, required=True, help="Folder where MTL Old2New embeddings are saved")
+    parser.add_argument("--mtl_first_phase_dir", type=str, required=True, help="Folder where MTL First Phase embeddings are saved")
     parser.add_argument("--fip_dir", type=str, required=True, help="Folder where FIP embeddings are saved")
-    parser.add_argument("--prop_mtl_dir", type=str, required=True, help="Folder where Propensity-Focused MTL embeddings are saved")
-    parser.add_argument("--churn_mtl_dir", type=str, required=True, help="Folder where Churn-Focused MTL embeddings are saved")
+    parser.add_argument("--mtl_prop_dir", type=str, required=True, help="Folder where MTL Propensity embeddings are saved")
+    parser.add_argument("--mtl_churn_dir", type=str, required=True, help="Folder where MTL Churn embeddings are saved")
     parser.add_argument("--bpr_sku_dir", type=str, required=True, help="Folder where BPR SKU embeddings are saved")
     parser.add_argument("--bpr_category_dir", type=str, required=True, help="Folder where BPR Category embeddings are saved")
     
@@ -35,19 +35,19 @@ def main():
 
     # First let's focus on the SRA and MTL embeddings
     sra_client_ids, sra_embeddings = load_clients_and_embeddings(args.sra_dir)
-    sra_client_ids_old, sra_embeddings_old = load_clients_and_embeddings(args.sra_old2new_dir)
+    sra_client_ids_old, sra_embeddings_old = load_clients_and_embeddings(args.sra_first_phase_dir)
 
-    assert np.array_equal(sra_client_ids, sra_client_ids_old), "Client IDs in SRA and SRA Old2New must match."
+    assert np.array_equal(sra_client_ids, sra_client_ids_old), "Client IDs in SRA and SRA First Phase must match."
 
     sra_regularized_embeddings = regularize_embeddings(sra_embeddings, sra_embeddings_old)
 
     mtl_client_ids, mtl_embeddings = load_clients_and_embeddings(args.mtl_dir)
-    mtl_client_ids_old, mtl_embeddings_old = load_clients_and_embeddings(args.mtl_old2new_dir)
+    mtl_client_ids_old, mtl_embeddings_old = load_clients_and_embeddings(args.mtl_first_phase_dir)
 
     mtl_regularized_embeddings = regularize_embeddings(mtl_embeddings, mtl_embeddings_old)
 
-    assert np.array_equal(sra_client_ids, sra_client_ids_old), "Client IDs in SRA and SRA Old2New must match."
-    assert np.array_equal(mtl_client_ids, mtl_client_ids_old), "Client IDs in MTL and MTL Old2New must match."
+    assert np.array_equal(sra_client_ids, sra_client_ids_old), "Client IDs in SRA and SRA First Phase must match."
+    assert np.array_equal(mtl_client_ids, mtl_client_ids_old), "Client IDs in MTL and MTL First Phase must match."
     assert np.array_equal(sra_client_ids, mtl_client_ids), "Client IDs in SRA and MTL must match."
     
     hybrid_reg_client_ids = sra_client_ids
@@ -55,8 +55,8 @@ def main():
 
     # Now let's load the other embeddings
     fip_client_ids, fip_embeddings = load_clients_and_embeddings(args.fip_dir)
-    prop_MTL_client_ids, prop_MTL_embeddings = load_clients_and_embeddings(args.prop_mtl_dir)
-    churn_MTL_client_ids, churn_MTL_embeddings = load_clients_and_embeddings(args.churn_mtl_dir)
+    prop_MTL_client_ids, prop_MTL_embeddings = load_clients_and_embeddings(args.mtl_prop_dir)
+    churn_MTL_client_ids, churn_MTL_embeddings = load_clients_and_embeddings(args.mtl_churn_dir)
     bpr_sku_client_ids, bpr_sku_embeddings = load_clients_and_embeddings(args.bpr_sku_dir)
     bpr_category_client_ids, bpr_category_embeddings = load_clients_and_embeddings(args.bpr_category_dir)
     

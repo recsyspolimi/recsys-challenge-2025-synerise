@@ -44,16 +44,16 @@ We worked under the supervision of:
 Our final submission is based on a hybrid approach that combines multiple embedding models to capture different aspects of user behavior. This configuration may not represent the definitive optimal architecture but rather the most effective one developed within the given timeframe.
 
 <p align="center">
-    <img src="assets/final_hybrid.jpg" alt="Final Model Architecture" width="40%" />
+    <img src="assets/final_hybrid.png" alt="Final Model Architecture" width="40%" />
 </p>
 
 The hybrid model combines:
 - **GRU-based models** for capturing temporal patterns and sequential behavior
 - **BPR models** for collaborative filtering on products and categories
-- **Old2New models** to leverage historical data for new user interactions
+- **First Phase models** to leverage historical data for new user interactions
 
 Specifically, in respect to the image above, we have:
-- **Standard Reconstruction Autoencoder (SRA)**: A model which includes a GRU encoder and decoder, trained with a reconstruction loss to capture sequential patterns in user behavior.
+- **Sequence Reconstruction Autoencoder (SRA)**: A model which includes a GRU encoder and decoder, trained with a reconstruction loss to capture sequential patterns in user behavior.
 - **MultiTask Learning (MTL)**: A model that extends the SRA. It includes a GRU encoder, with attention mechanism, and three small decoder for the challenge open tasks.
 - **Future Interaction Prediction (FIP)**: Alternative to the SRA model where given N-1 months of user interactions, the model predicts the next month interactions. It uses a GRU encoder and decoder, and uses MSE loss for target.
 - **BPR models**: Two Matrix Factorization models, with BPR as loss, specifically one for SKU and one for Category, whose propensity scores are concatenated to the embeddings for improving propensity tasks.
@@ -78,8 +78,8 @@ To generate the final submissions, we need to prepare the datasets and embedding
 - **groupedALL_only_last_month**: This dataset is the target used for the training GRU Future. It contains only the relevant clients and their interactions of the last month, with counting features of the whole 6 months (i.e. create the dataset with the whole data and then filter for the last month). The name convention for this dataset is `groupedALL_only_last_month`.
 
 #### Old dataset
-- **groupedALL_Old**: This dataset is the one used for the final submission of the old2new models. It contains all the clients and their interactions of the whole 6 months of the first stage dataset. The name convention for this dataset is `groupedAll_OLD`.
-- **grouped_OLD_split**: This dataset is the one used for the final submission of the old2new models. It contains only the relevant clients and their interactions of the first 5 months of the first stage dataset. The name convention for this dataset is `grouped_OLD_split`.
+- **groupedALL_Old**: This dataset is the one used for the final submission of the 'First Phase' models. It contains all the clients and their interactions of the whole 6 months of the first stage dataset. The name convention for this dataset is `groupedAll_OLD`.
+- **grouped_OLD_split**: This dataset is the one used for the final submission of the 'First Phase' models. It contains only the relevant clients and their interactions of the first 5 months of the first stage dataset. The name convention for this dataset is `grouped_OLD_split`.
 ### Datasets preparation
 Please in order, run the following .py files to prepare the datasets. The datasets will be saved in the --result_dir parameter, which you can set to your desired path. 
 1. Product Event Dataset: for generating sku and category events
@@ -109,9 +109,9 @@ For this section you need to run models run on both dataset
 ```bash
 python -m models.SRA.best_conf.standard_conf --embeddings_folder path/to/save/embeddings --dataset_all <groupedALL> --dataset <grouped>
 ```
-#### SRA Old2New
+#### SRA First Phase
 ```bash
-python -m models.SRA.best_conf.old2new --embeddings_folder path/to/save/embeddings --dataset_all <groupedALL_Old> --dataset <grouped>
+python -m models.SRA.best_conf.first_phase --embeddings_folder path/to/save/embeddings --dataset_all <groupedALL_Old> --dataset <grouped>
 ```
 
 ### FIP model
@@ -130,9 +130,10 @@ python -m models.MTL.best_conf.MTL_default_params \
   --data_dir path/to/ubc_data \
   --embeddings_folder path/to/save_model_and_embeddings \
   --train_dir_dataset <grouped_split> \
-  --submission_dir_dataset <grouped>
+  --submission_dir_dataset <grouped> \
+  --use_new_slope_columns
 ```
-#### MTL Old2New
+#### MTL First Phase
 ```bash
 python -m models.MTL.best_conf.MTL_default_params \
   --data_dir path/to/ubc_data \
@@ -140,7 +141,7 @@ python -m models.MTL.best_conf.MTL_default_params \
   --train_dir_dataset <grouped_OLD_split> \
   --submission_dir_dataset <grouped>
 ```
-#### Propensity-Focused MTL
+#### MTL Propensity
 ```bash
 python -m models.MTL.best_conf.MTL_propensity \
   --data_dir <path/to/ubc_data> \
@@ -148,7 +149,7 @@ python -m models.MTL.best_conf.MTL_propensity \
   --train_dir_dataset <grouped_split> \
   --submission_dir_dataset <grouped>
 ```
-#### Churn-Focused MTL
+#### MTL Churn
 ```bash
 python -m models.MTL.best_conf.MTL_churn \
   --data_dir path/to/ubc_data \
@@ -174,16 +175,16 @@ python -m models.BPR.bpr_sub --results-csv models/BPR/bpr_category.csv \
     
 ```
 
-# Build final hybrid
+## Build final hybrid
 ```bash
 python -m models.hybrid.generate_final_sub \
   --sra_dir <path_to_sra_embeddings> \
-  --sra_old2new_dir <path_to_sra_old2new_embeddings> \
+  --sra_first_phase_dir <path_to_sra_first_phase_embeddings> \
   --fip_dir <path_to_fip_embeddings> \
   --mtl_dir <path_to_mtl_embeddings> \
-  --mtl_old2new_dir <path_to_mtl_old2new_embeddings> \
-  --prop_mtl_dir <path_to_prop_focused_mtl_embeddings> \
-  --churn_mtl_dir <path_to_churn_focused_mtl_embeddings> \
+  --mtl_first_phase_dir <path_to_mtl_first_phase_embeddings> \
+  --mtl_prop_dir <path_to_mtl_prop_embeddings> \
+  --mtl_churn_dir <path_to_mtl_churn_embeddings> \
   --bpr_sku_dir <path_to_bpr_sku_embeddings> \
   --bpr_category_dir <path_to_bpr_category_embeddings> \
   --output_dir <path_to_output_directory>
