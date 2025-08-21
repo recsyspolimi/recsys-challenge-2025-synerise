@@ -9,7 +9,7 @@
 ## Challenge Description
 This [challenge](https://recsys.synerise.com/), organized by [Synerise](https://www.synerise.com/), promotes a unified approach to behavior modeling by introducing **Universal Behavioral Profiles**, compact user representations derived from diverse interaction data, such as product purchases, cart activity, page views, and search queries. These profiles are designed to generalize across a wide range of predictive tasks common in modern enterprises, including churn prediction, product propensity, and more.
 
-In this competition, participants are tasked with generating an embedding which summarizes user behaviour from the provided event data. These representations will serve as inputs to a simple, fixed neural network, which is trained and evaluated on several tasks:
+In this competition, participants are tasked with generating an embedding that summarizes user behaviour from the provided event data. These representations will serve as inputs to a simple, fixed neural network, which is trained and evaluated on several tasks:
 
 * **Open Tasks** (disclosed during the competition):
 
@@ -18,7 +18,7 @@ In this competition, participants are tasked with generating an embedding which 
   * **Category Propensity**: Predict which product categories a user is likely to purchase from.
 
 * **Hidden Tasks** (undisclosed until the competition ends):
-  Additional predictive tasks used to test the generalization capability of the submitted representations.
+  Additional predictive tasks were used to test the generalization capability of the submitted representations.
 
 Model training and evaluation are automated. Participants focus solely on submitting high-quality, task-agnostic user embeddings that generalize across both known and unknown tasks.
 
@@ -52,16 +52,16 @@ The hybrid model combines:
 - **BPR models** for collaborative filtering on products and categories
 - **First Phase models** to leverage historical data for new user interactions
 
-Specifically, in respect to the image above, we have:
+Specifically, with respect to the image above, we have:
 - **Sequence Reconstruction Autoencoder (SRA)**: A model which includes a GRU encoder and decoder, trained with a reconstruction loss to capture sequential patterns in user behavior.
-- **MultiTask Learning (MTL)**: A model that extends the SRA. It includes a GRU encoder, with attention mechanism, and three small decoder for the challenge open tasks.
+- **MultiTask Learning (MTL)**: A model that extends the SRA. It includes a GRU encoder, with attention mechanism, and three small decoders for the challenge open tasks.
 - **Future Interaction Prediction (FIP)**: Alternative to the SRA model where given N-1 months of user interactions, the model predicts the next month interactions. It uses a GRU encoder and decoder, and uses MSE loss for target.
 - **BPR models**: Two Matrix Factorization models, with BPR as loss, specifically one for SKU and one for Category, whose propensity scores are concatenated to the embeddings for improving propensity tasks.
 
 This ensemble approach allows us to create robust **Universal Behavioral Profiles** that generalize well across the diverse prediction tasks in the challenge.
 
 # Create Final submission
-We need to run different models since the hybrid is a combination of all our best results. For creating the best hybrid you need to first compute all the submodels.
+We need to run different models since the hybrid is a combination of all our best results. For creating the best hybrid, you need to first compute all the submodels.
 
 Most of the code has already set the parameters to obtain the exact embeddings we used for the final submission. So, in some of the code important steps, such as validation, are not often present. However, you can change the parameters to obtain different embeddings.
 
@@ -81,7 +81,7 @@ To generate the final submissions, we need to prepare the datasets and embedding
 - **groupedALL_Old**: This dataset is the one used for the final submission of the 'First Phase' models. It contains all the clients and their interactions of the whole 6 months of the first stage dataset. The name convention for this dataset is `groupedAll_OLD`.
 - **grouped_OLD_split**: This dataset is the one used for the final submission of the 'First Phase' models. It contains only the relevant clients and their interactions of the first 5 months of the first stage dataset. The name convention for this dataset is `grouped_OLD_split`.
 ### Datasets preparation
-Please in order, run the following .py files to prepare the datasets. The datasets will be saved in the --result_dir parameter, which you can set to your desired path. 
+Please, in order, run the following .py files to prepare the datasets. The datasets will be saved in the --result_dir parameter, which you can set to your desired path. 
 1. Product Event Dataset: for generating sku and category events
    ```bash
    python -m gru_preprocessing.events.sku_events --data_dir <path/to/ubc_data> --result_dir <path/to/save/results> --data_input_dir <path/to/parquet/data/for/dataset>
